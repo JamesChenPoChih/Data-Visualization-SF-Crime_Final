@@ -1,0 +1,101 @@
+# Data Visualization-SF Crime
+
+This project is the final assignment of the IBM course. Class 7: Data Visualization with Python. Objective: To create a map with markers to explore the crime rate in San Francisco, California. To create a Choropleth map to visualize crime in San Francisco.
+
+from IPython.display import Image
+Image("C:/Users/utdal/Desktop/python/Coursera/IBM/07/SanFrancisco_1.jpg")
+
+#### You can also follow this code
+https://python-graph-gallery.com/292-choropleth-map-with-folium/
+
+import pandas as pd
+import folium
+import os
+
+police_file = 'C:/Users/utdal/Desktop/python/Coursera/IBM/07/Police_Department_Incidents_-_Previous_Year__2016_.csv'
+
+#police_file = pd.read_csv('https://ibm.box.com/shared/static/nmcltjmocdi8sd5tk93uembzdec8zyaq.csv') ## downloadable
+sf_input = pd.read_csv(police_file, index_col=0)
+
+# Load the shape of the zone (US states)
+# Find the original file here: https://github.com/python-visualization/folium/tree/master/examples/data
+# You have to download this file and set the directory where you saved it
+sf_neighborhood_geo = os.path.join('C:/Users/utdal/Desktop/python/Coursera/IBM/07', 'san-francisco.json')
+
+
+sf_input.head(5)
+
+Now you should be ready to proceed with creating the Choropleth map.
+
+As you learned in the Choropleth maps lab, you will need a GeoJSON file that marks the boundaries of the different neighborhoods in San Francisco. In order to save you the hassle of looking for the right file, I already downloaded it for you and I am making it available via this link: https://cocl.us/sanfran_geojson.
+
+For the map, make sure that:
+
+it is centred around San Francisco,
+
+you use a zoom level of 12,
+
+you use fill_color = 'YlOrRd',
+
+you define fill_opacity = 0.7,
+
+you define line_opacity=0.2, and,
+
+you define a legend and use the default threshold scale.
+
+
+# define the world map
+world_map = folium.Map()
+
+# display world map
+world_map
+
+# San Francisco latitude and longitude values
+latitude = 37.77
+longitude = -122.42
+
+# create map and display it
+sanfran_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+
+# display the map of San Francisco
+sanfran_map
+
+# group by neighborhood
+sf = sf_input.groupby('PdDistrict').count()
+sf = pd.DataFrame(sf,columns=['Category'])  # remove unneeded columns
+sf.reset_index(inplace=True)   # default index, otherwise groupby column becomes index
+sf.rename(columns={'PdDistrict':'Neighborhood','Category':'Count'}, inplace=True)
+sf.sort_values(by='Count', inplace=True, ascending=False)
+#print(sf)
+
+# Shows sf now.
+sf
+
+# San Francisco latitude and longitude values
+latitude = 37.77
+longitude = -122.42
+sf_neighborhood_geo = 'C:/Users/utdal/Desktop/python/Coursera/IBM/07/san-francisco.geojson'
+
+# Create map
+sf_map = folium.Map(
+       location=[latitude,longitude],
+       zoom_start=12)
+
+# Use json file  TEST based on class
+sf_map.choropleth(
+       geo_data=sf_neighborhood_geo,
+       data=sf,
+       columns=['Neighborhood','Count'],
+       key_on='feature.properties.DISTRICT',
+       fill_color='YlOrRd',
+       fill_opacity='0.7',
+       line_opacity='0.2',
+       legend_name='Crime Rate in San Francisco, by Neighborhood')
+
+# display the map
+sf_map
+
+
+
+
+
